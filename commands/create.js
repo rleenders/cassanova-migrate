@@ -41,7 +41,7 @@ var migration${this.dateString} = {
 module.exports = migration${this.dateString};`;
     
     if (templateFile) {
-      template = this.fs.readFileSync(program.template);
+      template = this.fs.readFileSync(templateFile);
     }
     this.template = template;
   }
