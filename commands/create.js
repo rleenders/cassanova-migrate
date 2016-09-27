@@ -39,7 +39,6 @@ const migration = {
         return tools.cassandra.cql.executeNonQuery(context, db, query, params);
       })
       .then ((result)=>{
-        console.log(result);
         handler(false, true);
       })
       .catch((err)=>{
@@ -52,7 +51,6 @@ const migration = {
     
     tools.cassandra.cql.executeNonQuery(context, db, query, params)
       .then ((result)=>{
-        console.log(result);
         handler(false, true);
       })
       .catch((err)=>{
