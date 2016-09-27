@@ -4,7 +4,7 @@
   "description": "Cassandra migration for node.",
   "main": "./app.js",
   "bin": {
-    "cassandra-migrate": "./app.js"
+    "migrate": "./app.js"
   },
   "repository": {
     "type": "git",

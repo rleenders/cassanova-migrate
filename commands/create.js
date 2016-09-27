@@ -13,22 +13,51 @@ class Create {
     this.fs = fs;
     this.dateString = Math.floor(Date.now() / 1000) + '';
 
-    var template = `
-var migration${this.dateString} = {
+    let template = `
+'use strict';
+
+const tools = require('itaas-nodejs-tools');
+const uuid = require('uuid').v4;
+
+let config = {};
+let logger = tools.createLogger({logOutput: 'rotating-file', logDirectory: 'logs/migration'});
+let serviceLocator = tools.createServiceLocator();
+let context = tools.createCallContext(uuid(), config, logger, serviceLocator);
+
+const migration = {
   up : function (db, handler) {
-    var query = '';
-    var params = [];
-    db.execute(query, params, { prepare: true }, function (err) {
-      if (err) {
-        handler(err, false);
-      } else {
+    let query = '-- first query';
+    let params = [];
+
+    tools.cassandra.cql.executeNonQuery(context, db, query, params)
+      .then ((result)=>{
+        
+        let query = '-- second query';
+        let params = [];
+
+        return tools.cassandra.cql.executeNonQuery(context, db, query, params);
+      })
+      .then ((result)=>{
+        console.log(result);
         handler(false, true);
-      }
-    });
+      })
+      .catch((err)=>{
+        handler(err, false);
+      });
   },
   down : function (db, handler) {
-    var query = '';
-    var params = [];
+    let query = '-- first query';
+    let params = [];
+    
+    tools.cassandra.cql.executeNonQuery(context, db, query, params)
+      .then ((result)=>{
+        console.log(result);
+        handler(false, true);
+      })
+      .catch((err)=>{
+        handler(err, false);
+      });
+
     db.execute(query, params, { prepare: true }, function (err) {
       if (err) {
         handler(err, false);
@@ -38,7 +67,10 @@ var migration${this.dateString} = {
     });
   }
 };
-module.exports = migration${this.dateString};`;
+
+module.exports = migration;
+
+`;
     
     if (templateFile) {
       template = this.fs.readFileSync(templateFile);
@@ -47,13 +79,13 @@ module.exports = migration${this.dateString};`;
   }
 
   newMigration(title) {
-    var reTitle = /^[a-z0-9\_]*$/i;
+    let reTitle = /^[a-z0-9\_]*$/i;
     if (!reTitle.test(title)) {
       console.log("Invalid title. Only alphanumeric and '_' title is accepted.");
       process.exit(1);
     }
 
-    var fileName = `${this.dateString}_${title}.js`;
+    let fileName = `${this.dateString}_${title}.js`;
     this.fs.writeFileSync(`${process.cwd()}/${fileName}`, this.template);
     console.log(`Created a new migration file with name ${fileName}`);
   }
