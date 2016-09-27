@@ -2,16 +2,18 @@
 /*jslint node: true */
 "use strict";
 
-var program = require('commander');
-var Common = require('./util/common');
-var fs = require('fs');
-var DB = require('./util/database');
+const program = require('commander');
+const Common = require('./util/common');
+const fs = require('fs');
+const DB = require('./util/database');
+
+const migrationDirectory = 'migrations';
 
 /**
  * Usage information.
  */
 
-var usage = [
+const usage = [
   '',
   '  example : ',
   '',
@@ -53,7 +55,7 @@ program
   .option('-t, --template "<template>"', "sets the template for create")
   .action((title, options) => {
     let Create = require('./commands/create');
-    let create = new Create(fs, options.template);
+    let create = new Create(fs, migrationDirectory, options.template);
     create.newMigration(title);
     process.exit(0);
   });
@@ -67,7 +69,7 @@ program
     let db = new DB(program);
     let common = new Common(fs, db);
     common.createMigrationTable()
-      .then(common.getMigrationFiles(process.cwd()))
+      .then(common.getMigrationFiles(process.cwd() + `/${migrationDirectory}`))
       .then(() => common.getMigrations())
       .then(() => common.getMigrationSet('up', options.num))
       .then((migrationLists) => {
