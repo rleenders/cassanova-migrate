@@ -55,7 +55,7 @@ program
   .option('-t, --template "<template>"', "sets the template for create")
   .action((title, options) => {
     let Create = require('./commands/create');
-    let create = new Create(fs, migrationDirectory, options.template);
+    let create = new Create(fs, options.template, migrationDirectory);
     create.newMigration(title);
     process.exit(0);
   });
@@ -110,7 +110,7 @@ program
       .then((migrationLists) => {
         console.log('processing migration lists');
         let Down = require('./commands/down');
-        let down = new Down(db, migrationLists);
+        let down = new Down(db, migrationLists, migrationDirectory);
         if (!options.skip) {
           console.log('processing migration lists');
           console.log(migrationLists);

@@ -9,7 +9,7 @@
 
 class Create {
 
-  constructor(fs, migrationDirectory, templateFile) {
+  constructor(fs, templateFile, migrationDirectory) {
     this.directory = migrationDirectory;
     this.fs = fs;
     this.dateString = Math.floor(Date.now() / 1000) + '';
