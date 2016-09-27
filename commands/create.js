@@ -87,7 +87,7 @@ module.exports = migration;
     }
 
     let fileName = `${this.dateString}_${title}.js`;
-    this.fs.writeFileSync(`${process.cwd()}/${directory}/${fileName}`, this.template);
+    this.fs.writeFileSync(`${process.cwd()}/${this.directory}/${fileName}`, this.template);
     console.log(`Created a new migration file with name ${fileName}`);
   }
 }
