@@ -104,7 +104,7 @@ program
     let db = new DB(program);
     let common = new Common(fs, db);
     common.createMigrationTable()
-      .then(common.getMigrationFiles(process.cwd() + `/${migrationDirectory}`)))
+      .then(common.getMigrationFiles(process.cwd() + `/${migrationDirectory}`))
       .then(() => common.getMigrations())
       .then(() => common.getMigrationSet('down', options.num))
       .then((migrationLists) => {
