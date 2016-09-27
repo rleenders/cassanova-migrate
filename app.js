@@ -74,7 +74,7 @@ program
       .then(() => common.getMigrationSet('up', options.num))
       .then((migrationLists) => {
         let Up = require('./commands/up');
-        let up = new Up(db, migrationLists);
+        let up = new Up(db, migrationLists, migrationDirectory);
         if (!options.skip) {
           console.log('processing migration lists');
           console.log(migrationLists);
@@ -104,7 +104,7 @@ program
     let db = new DB(program);
     let common = new Common(fs, db);
     common.createMigrationTable()
-      .then(common.getMigrationFiles(process.cwd()))
+      .then(common.getMigrationFiles(process.cwd() + `/${migrationDirectory}`)))
       .then(() => common.getMigrations())
       .then(() => common.getMigrationSet('down', options.num))
       .then((migrationLists) => {
