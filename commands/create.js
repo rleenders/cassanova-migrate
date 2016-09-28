@@ -77,7 +77,7 @@ function create(name, directory, template) {
 
     let dateString = Math.floor(Date.now() / 1000) + '';
     let fileName = `${dateString}_${name}.js`;
-    let filePath = `${process.cwd()}/${this.directory}/${fileName}`;
+    let filePath = `${process.cwd()}/${directory}/${fileName}`;
 
     fs.writeFile(filePath, template, (err) => {
       if (err) {
