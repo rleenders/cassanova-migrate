@@ -48,7 +48,7 @@ program
   .description('initialize a new migration file with title.')
   .option('-t, --template "<template>"', "sets the template for create")
   .action((name, options) => {
-    create(name, options.template, migrationDirectory)
+    create(name, migrationDirectory, options.template)
       .then((value) => {
         process.exit(0);
       })
