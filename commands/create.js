@@ -1,20 +1,8 @@
 'use strict';
 
-/**
- * A method to create incremental new migrations
- * on create migration command.
- * e.g. cassandra-migration create
- * @param path
- */
+const fs = require('fs');
 
-class Create {
-
-  constructor(fs, templateFile, migrationDirectory) {
-    this.directory = migrationDirectory;
-    this.fs = fs;
-    this.dateString = Math.floor(Date.now() / 1000) + '';
-
-    let template = `
+const defaultTemplate = `
 'use strict';
 
 const tools = require('itaas-nodejs-tools');
@@ -68,26 +56,36 @@ const migration = {
 };
 
 module.exports = migration;
-
 `;
-    
-    if (templateFile) {
-      template = this.fs.readFileSync(templateFile);
-    }
-    this.template = template;
-  }
 
-  newMigration(title) {
-    let reTitle = /^[a-z0-9\_]*$/i;
-    if (!reTitle.test(title)) {
-      console.log("Invalid title. Only alphanumeric and '_' title is accepted.");
-      process.exit(1);
+function create(name, directory, template) {
+  return new Promise((resolve, reject) => {
+
+    let regexName = /^[a-z0-9\_]*$/i;
+
+    if (!regexName.test(name)) {
+      return reject("Invalid title. Only alphanumeric and '_' title is accepted.");
     }
 
+    if (!directory) {
+      return reject("Missing directory.");
+    }
+
+    if (!template) {
+      template = defaultTemplate;
+    }
+
+    let dateString = Math.floor(Date.now() / 1000) + '';
     let fileName = `${this.dateString}_${title}.js`;
-    this.fs.writeFileSync(`${process.cwd()}/${this.directory}/${fileName}`, this.template);
-    console.log(`Created a new migration file with name ${fileName}`);
-  }
+    let filePath = `${process.cwd()}/${this.directory}/${fileName}`;
+
+    fs.writeFile(filePath, template, (err) => {
+      if (err) {
+        return reject(err);
+      }
+      return resolve(filePath);
+    });
+  });
 }
 
-module.exports = Create;
+module.exports = create;

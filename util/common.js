@@ -65,39 +65,39 @@ class Common {
     return obj2;
   }
 
-  getMigrationSet(direction, n) {
+  getMigrationSet(direction, timestamp) {
     return new Promise((resolve, reject) => {
       let pending;
       if (direction == 'up') {
         pending = this.difference(this.filesRan, this.filesAvail);
-        if(n) {
+        if(timestamp) {
           for (let key in pending) {
-            if (pending[ n ]) {
-              if (pending.hasOwnProperty(key) && key > n) {
+            if (pending[ timestamp ]) {
+              if (pending.hasOwnProperty(key) && key > timestamp) {
                 delete pending[ key ];
               }
             } else {
-              if(this.filesRan[ n ]){
-                reject(`migration number ${n} already ran`);
+              if(this.filesRan[ timestamp ]){
+                reject(`migration with timestamp ${timestamp} already ran`);
               }else {
-                reject(`migration number ${n} not found in pending migrations`);
+                reject(`migration with timestamp ${timestamp} not found in pending migrations`);
               }
             }
           }
         }
       } else if (direction == 'down') {
         pending = this.filesRan;
-        if(n) {
+        if(timestamp) {
           for (let key in pending) {
-            if (pending[ n ]) {
-              if (pending.hasOwnProperty(key) && key < n) {
+            if (pending[ timestamp ]) {
+              if (pending.hasOwnProperty(key) && key < timestamp) {
                 delete pending [ key ];
               }
             } else {
-              if(this.filesAvail[ n ]){
-                reject(`migration number ${n} not run yet`);
+              if(this.filesAvail[ timestamp ]){
+                reject(`migration with timestamp ${timestamp} not run yet`);
               }else {
-                reject(`migration number ${n} not found in pending rollbacks`);
+                reject(`migration with timestamp ${timestamp} not found in pending rollbacks`);
               }
             }
           }

@@ -13,7 +13,7 @@ class Up {
     });
   }
 
-  runPending(skip) {
+  runPending() {
     return new Promise((resolve, reject) => {
       async.eachSeries(this.keyList, (id, callback) => {
         let fileName = this.pending[ id ];
@@ -25,21 +25,10 @@ class Up {
           'title': fileName.replace(".js", ""),
           'run': require(path.resolve(process.cwd() + `/${this.directory}/` + fileName))
         };
-        if (skip) {
-          if (query.migration_number == skip) {
-            console.log(`adding ${query.file_name} to Migration table, skipping migration`);
-            this.updateMigrationTable(query)
-              .then((result) => callback(null, result))
-              .catch((error) => callback(error));
-          } else {
-            callback(null, '');
-          }
-        } else {
-          this.run(query)
-            .then((query) => this.updateMigrationTable(query))
-            .then((result) => callback(null, result))
-            .catch((error) => callback(error));
-        }
+        this.run(query)
+          .then((query) => this.updateMigrationTable(query))
+          .then((result) => callback(null, result))
+          .catch((error) => callback(error));
 
       }, (err) => {
         if (err) {

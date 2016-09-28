@@ -13,7 +13,7 @@ class down {
     });
   }
 
-  runPending(skip) {
+  runPending() {
     return new Promise((resolve, reject) => {
       async.eachSeries(this.keyList, (id, callback) => {
         let fileName = this.pending[ id ];
@@ -22,21 +22,10 @@ class down {
           'file_name': fileName, 'migration_number': attributes[ 0 ], 'title': fileName.replace(".js", ""),
           'run': require(path.resolve(process.cwd() + `/${this.directory}/` + fileName))
         };
-        if (skip) {
-          if (skip == query.migration_number) {
-            console.log(`removing ${query.file_name} from migration table, skipping migration`);
-            this.updateMigrationTable(query)
-              .then((result) => callback(null, result))
-              .catch((error) => callback(error));
-          } else {
-            callback(null, '');
-          }
-        } else {
-          this.run(query)
-            .then((query) => this.updateMigrationTable(query))
-            .then((result) => callback(null, result))
-            .catch((error) => callback(error));
-        }
+        this.run(query)
+          .then((query) => this.updateMigrationTable(query))
+          .then((result) => callback(null, result))
+          .catch((error) => callback(error));
       }, (err) => {
         if (err) {
           reject(`Error Rolling Back Migrations: ${err}`);
