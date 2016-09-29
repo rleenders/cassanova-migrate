@@ -20,7 +20,7 @@ const usage = [
   '',
   '  cassandra-migrate down -k <keyspace> (Rolls back a single cassandra migration)',
   '',
-  '  cassandra-migrate <up/down> -n <migration_number>. (Runs cassandra migrations UP or DOWN to a particular migration number).',
+  '  cassandra-migrate <up/down> -t <migration_timestamp>. (Runs cassandra migrations UP or DOWN to a particular migration timestamp).',
   '',
   '  cassandra-migrate create <migration_name>. (Creates a new cassandra migration)',
   '',
@@ -95,14 +95,14 @@ program
 program
   .command('down')
   .description('roll back already run migrations')
-  .option('-n, --num "<number>"', 'rollback migrations down to a specified migration number')
+  .option('-t, --timestamp "<number>"', 'rollback migrations down to a specified migration timestamp')
   .action((options) => {
     let db = new DB(program);
     let common = new Common(fs, db);
     common.createMigrationTable()
       .then(common.getMigrationFiles(process.cwd() + `/${migrationDirectory}`))
       .then(() => common.getMigrations())
-      .then(() => common.getMigrationSet('down', options.num))
+      .then(() => common.getMigrationSet('down', options.timestamp))
       .then((migrationLists) => {
         let Down = require('./commands/down');
         let down = new Down(db, migrationLists, migrationDirectory);
