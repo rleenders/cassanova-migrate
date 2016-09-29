@@ -79,9 +79,9 @@ function create(name, directory, template) {
     let fileName = `${dateString}_${name}.js`;
     let filePath = `${process.cwd()}/${directory}/${fileName}`;
 
-    let directory = path.dirname(filePath);
+    let directoryPath = path.dirname(filePath);
 
-    ensureDirectoryExists(directory)
+    ensureDirectoryExists(directoryPath)
       .then((result) => {
         fs.writeFile(filePath, template, (err) => {
           if (err) {
@@ -93,9 +93,9 @@ function create(name, directory, template) {
   });
 }
 
-function ensureDirectoryExists(directory) {
+function ensureDirectoryExists(directoryPath) {
   return new Promise((resolve, reject) => {
-    mkdirp(directory, (err) => {
+    mkdirp(directoryPath, (err) => {
       if (err) {
         return reject(err);
       }
