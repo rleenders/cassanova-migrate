@@ -6,9 +6,15 @@
   "bin": {
     "migrate": "./app.js"
   },
+  "scripts": {
+    "test": "mocha test/unit --recursive"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rleenders/cassandra-migrate.git"
+    "url": "git+https://github.com/UUX-Brasil/cassandra-migrate"
+  },
+  "bugs": {
+    "url": "https://github.com/UUX-Brasil/cassandra-migrate/issues"
   },
   "keywords": [
     "cassandra",
@@ -17,24 +23,22 @@
     "migration",
     "node"
   ],
-  "author": "Robin Leenders <leendersr@gmail.com>",
-  "license": "MIT",
-  "contributors": [
-    {
-      "name": "Karan Keswani",
-      "email": "keswanikaran@gmail.com"
-    }
-  ],
-  "bugs": {
-    "url": "https://github.com/rleenders/cassandra-migrate/issues"
-  },
-  "homepage": "https://github.com/rleenders/cassandra-migrate#readme",
   "dependencies": {
     "async": "^0.9.0",
     "cassandra-driver": "^3.0.0",
     "commander": "^2.8.1",
     "mkdirp": "^0.5.1"
   },
-  "devDependencies": {},
-  "scripts": {}
+  "devDependencies": {
+    "eslint": "2.13.0",
+    "istanbul": "^0.4.4",
+    "mocha": "2.3.4",
+    "nodemon": "^1.9.2",
+    "rimraf": "^2.5.4",
+    "should": "8.2.2",
+    "supertest": "1.2.0"
+  },
+  "author": "",
+  "license": "MIT",
+  "homepage": "https://github.com/UUX-Brasil/cassandra-migrate#readme"
 }
