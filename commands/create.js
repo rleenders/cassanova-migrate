@@ -2,8 +2,7 @@
 
 const fs = require('fs');
 
-const defaultTemplate = `
-'use strict';
+const defaultTemplate = `'use strict';
 
 const tools = require('itaas-nodejs-tools');
 const uuid = require('uuid').v4;

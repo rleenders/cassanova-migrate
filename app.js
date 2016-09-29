@@ -50,6 +50,7 @@ program
   .action((name, options) => {
     create(name, migrationDirectory, options.template)
       .then((value) => {
+        console.log(`New migration created at ${value}`);
         process.exit(0);
       })
       .catch((err) => {
@@ -104,7 +105,6 @@ program
       .then(() => common.getMigrations())
       .then(() => common.getMigrationSet('down', options.num))
       .then((migrationLists) => {
-        console.log('processing migration lists');
         let Down = require('./commands/down');
         let down = new Down(db, migrationLists, migrationDirectory);
 
