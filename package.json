@@ -32,10 +32,9 @@
   "dependencies": {
     "async": "^0.9.0",
     "cassandra-driver": "^3.0.0",
-    "commander": "^2.8.1"
+    "commander": "^2.8.1",
+    "mkdirp": "^0.5.1"
   },
-  "devDependencies": {
-  },
-  "scripts": {
-  }
+  "devDependencies": {},
+  "scripts": {}
 }

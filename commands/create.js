@@ -1,7 +1,8 @@
 'use strict';
 
 const fs = require('fs');
-
+const mkdirp = require('mkdirp');
+const path = require('path');
 const defaultTemplate = `'use strict';
 
 const tools = require('itaas-nodejs-tools');
@@ -78,11 +79,28 @@ function create(name, directory, template) {
     let fileName = `${dateString}_${name}.js`;
     let filePath = `${process.cwd()}/${directory}/${fileName}`;
 
-    fs.writeFile(filePath, template, (err) => {
+    let directory = path.dirname(filePath);
+
+    ensureDirectoryExists(directory)
+      .then((result) => {
+        fs.writeFile(filePath, template, (err) => {
+          if (err) {
+            return reject(err);
+          }
+          return resolve(filePath);
+        });
+      });
+  });
+}
+
+function ensureDirectoryExists(directory) {
+  return new Promise((resolve, reject) => {
+    mkdirp(directory, (err) => {
       if (err) {
         return reject(err);
       }
-      return resolve(filePath);
+
+      return resolve();
     });
   });
 }
