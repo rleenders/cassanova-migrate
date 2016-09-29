@@ -77,7 +77,11 @@ function create(name, directory, template) {
 
     let dateString = Math.floor(Date.now() / 1000) + '';
     let fileName = `${dateString}_${name}.js`;
-    let filePath = `${process.cwd()}/${directory}/${fileName}`;
+
+    let filePath = path.join(
+      process.cwd(),
+      directory,
+      fileName);
 
     let directoryPath = path.dirname(filePath);
 
