@@ -43,7 +43,7 @@ class Up {
 
   run(query) {
     return new Promise((resolve, reject) => {
-      console.log(`Migrating changes: ${query.title}`);
+      console.log(`  Migrating changes: ${query.title}`);
       let db = this.db;
       query.run.up(db, function (err) {
         if (err) {

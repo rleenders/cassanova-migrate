@@ -74,8 +74,7 @@ program
         let Up = require('./commands/up');
         let up = new Up(db, migrationLists, migrationDirectory);
 
-        console.log('processing migration lists');
-        console.log(migrationLists);
+        console.log('Processing migrations');
 
         up.runPending()
           .then(result => {
@@ -108,8 +107,7 @@ program
         let Down = require('./commands/down');
         let down = new Down(db, migrationLists, migrationDirectory);
 
-        console.log('processing migration lists');
-        console.log(migrationLists);
+        console.log('Processing migrations');
 
         down.runPending()
           .then(result => {

@@ -39,7 +39,7 @@ class down {
 
   run(query) {
     return new Promise((resolve, reject) => {
-      console.log(`Rolling back changes: ${query.title}`);
+      console.log(`  Rolling back changes: ${query.title}`);
       let db = this.db;
       query.run.down(db, function (err) {
         if (err) {
