@@ -21,7 +21,9 @@ describe('Create', function () {
 
     create('my_awesome_name', 'test-data')
       .then((result) => {
-        fs.readdirSync(directoryPath).should.have.length(1);
+        let files = fs.readdirSync(directoryPath)
+        files.should.have.length(1);
+        files[0].should.endWith('my_awesome_name.js');
         done();
       })
       .catch((err) => {
@@ -29,5 +31,3 @@ describe('Create', function () {
       });
   });
 });
-
-
