@@ -21,7 +21,7 @@ describe('Create', function () {
 
     create('my_awesome_name', 'test-data')
       .then((result) => {
-        let files = fs.readdirSync(directoryPath)
+        let files = fs.readdirSync(directoryPath);
         files.should.have.length(1);
         files[0].should.endWith('my_awesome_name.js');
         done();

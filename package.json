@@ -7,11 +7,9 @@
     "migrate": "./app.js"
   },
   "scripts": {
-    "test": "mocha test/unit --recursive",
-    "debug-test": "mocha test/unit --recursive --debug-brk=5858",
-    "integration-test": "mocha test/integration --recursive -t 15000",
-    "debug-integration-test": "mocha test/integration --recursive --debug-brk=5858 -t 15000",
-    "coverage": "istanbul cover --include-all-sources true node_modules/mocha/bin/_mocha -- test/unit --recursive -t 15000",
+    "test": "mocha test/unit test/integration --recursive",
+    "debug-test": "mocha test/unit test/integration --recursive --debug-brk=5858",
+    "coverage": "istanbul cover --include-all-sources true node_modules/mocha/bin/_mocha -- test/unit test/integration --recursive",
     "lint": "eslint .",
     "nodemon": "nodemon --exec \"npm run lint && npm test && npm run coverage\""
   },
@@ -33,7 +31,9 @@
     "async": "^0.9.0",
     "cassandra-driver": "^3.0.0",
     "commander": "^2.8.1",
-    "mkdirp": "^0.5.1"
+    "itaas-nodejs-tools": "git+https://github.com/UUX-Brasil/itaas-nodejs-tools.git#master",
+    "mkdirp": "^0.5.1",
+    "uuid": "^2.0.3"
   },
   "devDependencies": {
     "eslint": "2.13.0",

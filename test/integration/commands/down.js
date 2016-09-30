@@ -13,7 +13,7 @@ let logger = tools.createLogger({logOutput: 'rotating-file', logDirectory: 'logs
 let serviceLocator = tools.createServiceLocator();
 let context = tools.createCallContext(uuid(), config, logger, serviceLocator);
 
-describe('Up', function () {
+describe('Down', function () {
   beforeEach(function (){
     migrationFiles.move();
     process.env.DBHOST = 'localhost';
@@ -21,12 +21,15 @@ describe('Up', function () {
 
     return databaseHelper.setupDatabase();
   });
-  
-  it('should run all migrations up', function () {
+
+  it('should run all migrations down', function () {
     let options = {};
     
     return actions.upAction(options)
       .then((result)=>{
+        return actions.downAction(options);
+      })
+      .then((result)=>{        
         let client = databaseHelper.createClient(databaseHelper.getTestDriverOptions());
 
         return tools.cassandra.cql.executeQuery(
@@ -36,18 +39,19 @@ describe('Up', function () {
           {fileName: '1000000000_first_migration.js'});
       })
       .then((result)=>{
-        result.should.have.length(1);
-        result[0].file_name.should.be.equal('1000000000_first_migration.js');
-        result[0].migration_number.should.be.equal('1000000000');
-        result[0].title.should.be.equal('1000000000_first_migration');
+        result.should.have.length(0);
       });
   });
 
   it('should run until target', function () {
-    let options = {timestamp: '1000000000'};
+    let options = {};
     
     return actions.upAction(options)
       .then((result)=>{
+        let downOptions = {timestamp: '1000000001'};
+        return actions.downAction(downOptions);
+      })
+      .then((result)=>{        
         let client = databaseHelper.createClient(databaseHelper.getTestDriverOptions());
 
         return tools.cassandra.cql.executeQuery(

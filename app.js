@@ -1,14 +1,10 @@
 #!/usr/bin/env node
-/*jslint node: true */
-"use strict";
+'use strict';
 
 const program = require('commander');
-const Common = require('./util/common');
 const fs = require('fs');
-const DB = require('./util/database');
 
-const migrationDirectory = 'migrations';
-const create = require('./commands/create');
+const actions = require('./commands/command-actions');
 
 const usage = [
   '',
@@ -20,12 +16,14 @@ const usage = [
   '',
   '  cassandra-migrate down -k <keyspace> (Rolls back a single cassandra migration)',
   '',
-  '  cassandra-migrate <up/down> -t <migration_timestamp>. (Runs cassandra migrations UP or DOWN to a particular migration timestamp).',
+  '  cassandra-migrate <up/down> -t <migration_timestamp>.',
+  '(Runs cassandra migrations UP or DOWN to a particular migration timestamp).',
   '',
   '  cassandra-migrate create <migration_name>. (Creates a new cassandra migration)',
   '',
-  '  cassandra-migrate create <migration_name> -t <template> (Creates a new cassandra migrate but uses a specified template instead of default).',
-  '',
+  '  cassandra-migrate create <migration_name> -t <template>',
+  '(Creates a new cassandra migrate but uses a specified template instead of default).',
+  ''
 
 ].join('\n');
 
@@ -34,27 +32,22 @@ program.on('--help', function () {
 });
 
 program
-  .version(JSON.parse(fs.readFileSync(__dirname + '/package.json', 'utf8')).version)
-  .option('-k, --keyspace "<keyspace>"', "The name of the keyspace to use.")
-  .option('-H, --hosts "<host,host>"', "Comma seperated host addresses. Default is [\"localhost\"].")
-  .option('-u, --username "<username>"', "database username")
-  .option('-p, --password "<password>"', "database password")
-  .option('-o, --optionFile "<pathToFile>"', "pass in a javascript option file for the cassandra driver, note that certain option file values can be overridden by provided flags");
+  .version(JSON.parse(fs.readFileSync(__dirname + '/package.json', 'utf8')).version);
 
 program.name = 'cassandra-migrate';
 
 program
   .command('create <name>')
   .description('initialize a new migration file with title.')
-  .option('-t, --template "<template>"', "sets the template for create")
-  .action((name, options) => {
-    create(name, migrationDirectory, options.template)
-      .then((value) => {
-        console.log(`New migration created at ${value}`);
+  .option('-t, --template "<template>"', 'sets the template for create')
+  .action((options) => {
+    return actions.createAction(options)
+      .then(result => {
+        console.log(result);
         process.exit(0);
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(error => {
+        console.log(error);
         process.exit(1);
       });
   });
@@ -64,32 +57,15 @@ program
   .description('run pending migrations')
   .option('-t, --timestamp "<number>"', 'run migrations up to a specified migration timestamp')
   .action((options) => {
-    let db = new DB(program);
-    let common = new Common(fs, db);
-    common.createMigrationTable()
-      .then(common.getMigrationFiles(process.cwd() + `/${migrationDirectory}`))
-      .then(() => common.getMigrations())
-      .then(() => common.getMigrationSet('up', options.timestamp))
-      .then((migrationLists) => {
-        let Up = require('./commands/up');
-        let up = new Up(db, migrationLists, migrationDirectory);
-
-        console.log('Processing migrations');
-
-        up.runPending()
-          .then(result => {
-            console.log(result);
-            process.exit(0);
-          }, error => {
-            console.log(error);
-            process.exit(1);
-          });
+    return actions.upAction(options)
+      .then(result => {
+        console.log(result);
+        process.exit(0);
       })
       .catch(error => {
         console.log(error);
         process.exit(1);
       });
-
   });
 
 program
@@ -97,26 +73,10 @@ program
   .description('roll back already run migrations')
   .option('-t, --timestamp "<number>"', 'rollback migrations down to a specified migration timestamp')
   .action((options) => {
-    let db = new DB(program);
-    let common = new Common(fs, db);
-    common.createMigrationTable()
-      .then(common.getMigrationFiles(process.cwd() + `/${migrationDirectory}`))
-      .then(() => common.getMigrations())
-      .then(() => common.getMigrationSet('down', options.timestamp))
-      .then((migrationLists) => {
-        let Down = require('./commands/down');
-        let down = new Down(db, migrationLists, migrationDirectory);
-
-        console.log('Processing migrations');
-
-        down.runPending()
-          .then(result => {
-            console.log(result);
-            process.exit(0);
-          }, error => {
-            console.log(error);
-            process.exit(1);
-          });
+    return actions.downAction(options)
+      .then(result => {
+        console.log(result);
+        process.exit(0);
       })
       .catch(error => {
         console.log(error);

@@ -1,12 +1,12 @@
 'use strict';
-var migration_settings = require('../scripts/migrationSettings.json');
+
+const migration_settings = require('../scripts/migrationSettings.json');
 
 class Common {
   constructor(fs, db) {
     this.db = db;
     this.fs = fs;
     this.reFileName = /^[0-9]{10}_[a-z0-9\_]*.js$/i;
-    this.exists = this.fs.existsSync || path.existsSync;
   }
 
   createMigrationTable() {
@@ -23,7 +23,7 @@ class Common {
   getMigrations() {
     return new Promise((resolve, reject) => {
       this.filesRan = {};
-      var self = this;
+      let self = this;
       this.db.execute(migration_settings.getMigration, null, { prepare: true }, function (err, alreadyRanFiles) {
         if (err) {
           reject(err);
@@ -103,9 +103,9 @@ class Common {
           }
         }
       } else {
-        reject('Migration direction must be specified')
+        reject('Migration direction must be specified');
       }
-      resolve(pending);
+      resolve(pending || {});
     });
   }
 

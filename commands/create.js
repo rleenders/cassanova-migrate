@@ -64,11 +64,11 @@ function create(name, directory, template) {
     let regexName = /^[a-z0-9\_]*$/i;
 
     if (!regexName.test(name)) {
-      return reject("Invalid title. Only alphanumeric and '_' title is accepted.");
+      return reject('Invalid title. Only alphanumeric and \'_\' title is accepted.');
     }
 
     if (!directory) {
-      return reject("Missing directory.");
+      return reject('Missing directory.');
     }
 
     if (!template) {

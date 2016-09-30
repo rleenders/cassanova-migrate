@@ -1,7 +1,7 @@
 'use strict';
-var async = require('async');
-var migration_settings = require('../scripts/migrationSettings.json');
-var path = require('path');
+const async = require('async');
+const migration_settings = require('../scripts/migrationSettings.json');
+const path = require('path');
 
 class down {
   constructor(db, pendingMigrations, directory) {
@@ -17,9 +17,9 @@ class down {
     return new Promise((resolve, reject) => {
       async.eachSeries(this.keyList, (id, callback) => {
         let fileName = this.pending[ id ];
-        let attributes = fileName.split("_");
+        let attributes = fileName.split('_');
         let query = {
-          'file_name': fileName, 'migration_number': attributes[ 0 ], 'title': fileName.replace(".js", ""),
+          'file_name': fileName, 'migration_number': attributes[ 0 ], 'title': fileName.replace('.js', ''),
           'run': require(path.resolve(process.cwd() + `/${this.directory}/` + fileName))
         };
         this.run(query)
@@ -64,7 +64,7 @@ class down {
           resolve(`Successfully Rolled Back ${query.title}`);
         }
       });
-    })
+    });
   }
 
 }
