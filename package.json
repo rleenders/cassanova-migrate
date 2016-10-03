@@ -7,9 +7,9 @@
     "migrate": "./app.js"
   },
   "scripts": {
-    "test": "mocha test/unit test/integration --recursive",
+    "test": "mocha test/unit test/integration -t 10000 --recursive",
     "debug-test": "mocha test/unit test/integration --recursive --debug-brk=5858",
-    "coverage": "istanbul cover --include-all-sources true node_modules/mocha/bin/_mocha -- test/unit test/integration --recursive",
+    "coverage": "istanbul cover --include-all-sources true node_modules/mocha/bin/_mocha -- test/unit test/integration -t 10000 --recursive",
     "lint": "eslint .",
     "nodemon": "nodemon --exec \"npm run lint && npm test && npm run coverage\""
   },
