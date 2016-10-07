@@ -1,41 +1,31 @@
 'use strict';
-var async = require('async');
-var migration_settings = require('../scripts/migrationSettings.json');
-var path = require('path');
+const async = require('async');
+const migration_settings = require('../scripts/migrationSettings.json');
+const path = require('path');
 
 class down {
-  constructor(db, pendingMigrations) {
+  constructor(db, pendingMigrations, directory) {
     this.db = db;
+    this.directory = directory;
     this.pending = pendingMigrations;
     this.keyList = Object.keys(pendingMigrations).sort(function (a, b) {
       return b - a;
     });
   }
 
-  runPending(skip) {
+  runPending() {
     return new Promise((resolve, reject) => {
       async.eachSeries(this.keyList, (id, callback) => {
         let fileName = this.pending[ id ];
-        let attributes = fileName.split("_");
+        let attributes = fileName.split('_');
         let query = {
-          'file_name': fileName, 'migration_number': attributes[ 0 ], 'title': fileName.replace(".js", ""),
-          'run': require(path.resolve(process.cwd() + "/" + fileName))
+          'file_name': fileName, 'migration_number': attributes[ 0 ], 'title': fileName.replace('.js', ''),
+          'run': require(path.resolve(process.cwd() + `/${this.directory}/` + fileName))
         };
-        if (skip) {
-          if (skip == query.migration_number) {
-            console.log(`removing ${query.file_name} from migration table, skipping migration`);
-            this.updateMigrationTable(query)
-              .then((result) => callback(null, result))
-              .catch((error) => callback(error));
-          } else {
-            callback(null, '');
-          }
-        } else {
-          this.run(query)
-            .then((query) => this.updateMigrationTable(query))
-            .then((result) => callback(null, result))
-            .catch((error) => callback(error));
-        }
+        this.run(query)
+          .then((query) => this.updateMigrationTable(query))
+          .then((result) => callback(null, result))
+          .catch((error) => callback(error));
       }, (err) => {
         if (err) {
           reject(`Error Rolling Back Migrations: ${err}`);
@@ -49,7 +39,7 @@ class down {
 
   run(query) {
     return new Promise((resolve, reject) => {
-      console.log(`Rolling back changes: ${query.title}`);
+      console.log(`  Rolling back changes: ${query.title}`);
       let db = this.db;
       query.run.down(db, function (err) {
         if (err) {
@@ -74,7 +64,7 @@ class down {
           resolve(`Successfully Rolled Back ${query.title}`);
         }
       });
-    })
+    });
   }
 
 }
