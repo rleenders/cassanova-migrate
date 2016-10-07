@@ -40,7 +40,7 @@ program
   .command('create <name>')
   .description('initialize a new migration file with title.')
   .option('-t, --template "<template>"', 'sets the template for create')
-  .action((options) => {
+  .action((name, options) => {
     return actions.createAction(options)
       .then(result => {
         console.log(result);
