@@ -2,17 +2,8 @@
 
 Cassandra-migrate is a incremental migration tool for Cassandra.
 
-## Version 1.2.0 update
-Just added support for more robust Cassandra client configuration, now you can provide a path to a configuration file that can specify a Cassandra client option object directly as javascript.
-Cassandra client options configuration can found [here](http://docs.datastax.com/en/latest-nodejs-driver-api/global.html#ClientOptions). A user
-can override the client options file using either the command line flags, or environment variables
-
-## Version 1.1.2 update
-the format of the migration table has changed, to facilitate the change over I've included an example migration file (0000000000_updateMigrationTable.js)
-that should nondestructivly update the migration table to the new format, just copy it into your migrations folder and run it before running any other migrations
-
 ## Features
-- Uses the node cassandra-driver  to run incremental migrations on Cassandra database.
+- Uses the node cassandra-driver to run incremental migrations on Cassandra database.
 - Uses Cassandra keyspace mentioned in commandline to keep track of ran migrations.
 - Automatically builds and run UP or DOWN until any migration number.
 - Creates a new incremental migration template by a single command.
@@ -23,61 +14,111 @@ that should nondestructivly update the migration table to the new format, just c
 Install [node.js](http://nodejs.org/) and [cassandra](http://cassandra.apache.org/) and [cassandra-driver](https://www.npmjs.com/package/cassandra-driver). Then:
 
 ```
-npm install cassandra-migrate
+npm install git+https://github.com/UUX-Brasil/itaas-nodejs-tools.git#v1.0.0
 ```
 
 ## Overview
 
 ### Basic Usage
 
+Add a file with the follow content to your app:
+```
+'use strict';
+
+const exec = require('child_process').exec;
+const getConfig = require('./my-config-file'); //CHANGE HERE
+
+function execCallback(error, stdout, stderr) {
+  // Log the output
+  if (stdout) {
+    console.log(stdout);
+  }
+
+  if (error) {
+    // Log the err if it exists
+    if (stderr) {
+      console.log(stderr);
+    }
+
+    // Exit with the same error code from subprocess
+    process.exit(error.code);
+  }
+  
+  // It is OK
+  process.exit(0);
+}
+
+function formatParams(paramaters){
+  let params = '';
+
+  // Ignore the first two parameters
+  // First is node executable
+  // Second is this file
+  for (let i = 2; i < paramaters.length; i++){
+    params += paramaters[i] + ' ';
+  }
+
+  params = params.trim();
+
+  return params; 
+}
+
+function setEnvironmentVariables(config){
+  process.env.DBHOST = config.MY_CASSANDRA_IP_LIST.join(','); // CHANGE HERE
+  process.env.DBKEYSPACE = config.MY_KEY_SPACE; // CHANGE HERE
+  process.env.DBUSER = config.MY_CASSANDRA_USER; // CHANGE HERE
+  process.env.DBPASSWORD = config.MY_CASSANDRA_PASSWORD; // CHANGE HERE
+}
+
+// Set environment variables
+let config = getConfig();
+setEnvironmentVariables(config);
+
+// Get Params
+let params = formatParams(process.argv);
+
+// Format command
+let command = `migrate ${params}`;
+
+// Exec
+exec(command, execCallback);
+```
+Name it whatever you want, like `./app/migrate.js`, and add this to your `package.json` scripts:
+```
+node ./app/migrate.js
+```
+
 Creates a new migration with a timestamped migration number ( Used for tracking migrations ).
 
 ```
-    cassandra-migrate create <title>
+    migrate create <title>
 ```
 
 Runs all migrations available in current directory.
 
 ```
-    cassandra-migrate up -k <keyspace>
+    migrate up -k <keyspace>
 ```
 
 Rolls back all migrations in the migrations table.
 
 ```
-    cassandra-migrate down -k <keyspace>
+    migrate down -k <keyspace>
 ```
 
 
 Goes back/forward to a particular migration automatically.
 
 ```
-    cassandra-migrate <up/down> -k <keyspace> -n <migration-number>
+    migrate <up/down> -k <keyspace> -t <migration_timestamp>
 ```
 
-Skips a particular migration (either adds or removes the migration from the table without running any scripts.
-
-```
-    cassandra-migrate <up/down> -k <keyspace> -s <migration-number>
-```
-
-Define host, username, and password. By default connects to [localhost] and default cassandra port [9042].
-
-```
-    cassandra-migrate -H [10.10.10.1] -u username -p password
-```
-
-Cassandra connection details can also be specified in environmental variables
+Cassandra connection details can be specified in environmental variables
 ```
     DBHOST : sets hostname
     DBKEYSPACE : sets keyspace
     DBUSER : sets username
     DBPASSWORD : sets password;
-```
-
-As of 1.2.0 Cassandra connection details can now also be specified in configuration file [example](https://github.com/rleenders/cassandra-migrate/blob/options-file-flag/examples/sampleOptionFile.js) you can point to the file's relative path with:
-```
-  cassandra-migrate -o <path/to/file.js>
 ```
 
 More help.
@@ -94,4 +135,4 @@ cassandra-migrate is distributed under the [MIT license](http://opensource.org/l
 
 Feel free to join in and support the project!
 
-Check the [Issue tracker](https://github.com/rleenders/cassandra-migrate/issues)
+This repo was forked from: [rleenders/cassandra-migrate](https://github.com/rleenders/cassandra-migrate/issues)

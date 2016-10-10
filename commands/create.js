@@ -1,34 +1,50 @@
 'use strict';
 
-/**
- * A method to create incremental new migrations
- * on create migration command.
- * e.g. cassandra-migration create
- * @param path
- */
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const path = require('path');
+const defaultTemplate = `'use strict';
 
-class Create {
+const tools = require('itaas-nodejs-tools');
+const uuid = require('uuid').v4;
 
-  constructor(fs, templateFile) {
-    this.fs = fs;
-    this.dateString = Math.floor(Date.now() / 1000) + '';
+let config = {};
+let logger = tools.createLogger({logOutput: 'rotating-file', logDirectory: 'logs/migration'});
+let serviceLocator = tools.createServiceLocator();
+let context = tools.createCallContext(uuid(), config, logger, serviceLocator);
 
-    var template = `
-var migration${this.dateString} = {
+const migration = {
   up : function (db, handler) {
-    var query = '';
-    var params = [];
-    db.execute(query, params, { prepare: true }, function (err) {
-      if (err) {
-        handler(err, false);
-      } else {
+    let query = '-- first query';
+    let params = [];
+
+    tools.cassandra.cql.executeNonQuery(context, db, query, params)
+      .then ((result)=>{
+        
+        let query = '-- second query';
+        let params = [];
+
+        return tools.cassandra.cql.executeNonQuery(context, db, query, params);
+      })
+      .then ((result)=>{
         handler(false, true);
-      }
-    });
+      })
+      .catch((err)=>{
+        handler(err, false);
+      });
   },
   down : function (db, handler) {
-    var query = '';
-    var params = [];
+    let query = '-- first query';
+    let params = [];
+    
+    tools.cassandra.cql.executeNonQuery(context, db, query, params)
+      .then ((result)=>{
+        handler(false, true);
+      })
+      .catch((err)=>{
+        handler(err, false);
+      });
+
     db.execute(query, params, { prepare: true }, function (err) {
       if (err) {
         handler(err, false);
@@ -38,25 +54,59 @@ var migration${this.dateString} = {
     });
   }
 };
-module.exports = migration${this.dateString};`;
-    
-    if (templateFile) {
-      template = this.fs.readFileSync(program.template);
-    }
-    this.template = template;
-  }
 
-  newMigration(title) {
-    var reTitle = /^[a-z0-9\_]*$/i;
-    if (!reTitle.test(title)) {
-      console.log("Invalid title. Only alphanumeric and '_' title is accepted.");
-      process.exit(1);
+module.exports = migration;
+`;
+
+function create(name, directory, template) {
+  return new Promise((resolve, reject) => {
+
+    let regexName = /^[a-z0-9\_]*$/i;
+
+    if (!regexName.test(name)) {
+      return reject('Invalid title. Only alphanumeric and \'_\' title is accepted.');
     }
 
-    var fileName = `${this.dateString}_${title}.js`;
-    this.fs.writeFileSync(`${process.cwd()}/${fileName}`, this.template);
-    console.log(`Created a new migration file with name ${fileName}`);
-  }
+    if (!directory) {
+      return reject('Missing directory.');
+    }
+
+    if (!template) {
+      template = defaultTemplate;
+    }
+
+    let dateString = Math.floor(Date.now() / 1000) + '';
+    let fileName = `${dateString}_${name}.js`;
+
+    let filePath = path.join(
+      process.cwd(),
+      directory,
+      fileName);
+
+    let directoryPath = path.dirname(filePath);
+
+    ensureDirectoryExists(directoryPath)
+      .then((result) => {
+        fs.writeFile(filePath, template, (err) => {
+          if (err) {
+            return reject(err);
+          }
+          return resolve(filePath);
+        });
+      });
+  });
 }
 
-module.exports = Create;
+function ensureDirectoryExists(directoryPath) {
+  return new Promise((resolve, reject) => {
+    mkdirp(directoryPath, (err) => {
+      if (err) {
+        return reject(err);
+      }
+
+      return resolve();
+    });
+  });
+}
+
+module.exports = create;

@@ -1,14 +1,24 @@
 {
   "name": "cassandra-migrate",
-  "version": "1.2.2",
+  "version": "1.0.0",
   "description": "Cassandra migration for node.",
   "main": "./app.js",
   "bin": {
-    "cassandra-migrate": "./app.js"
+    "migrate": "./app.js"
+  },
+  "scripts": {
+    "test": "mocha test/unit test/integration -t 10000 --recursive",
+    "debug-test": "mocha test/unit test/integration --recursive --debug-brk=5858",
+    "coverage": "istanbul cover --include-all-sources true node_modules/mocha/bin/_mocha -- test/unit test/integration -t 10000 --recursive",
+    "lint": "eslint .",
+    "nodemon": "nodemon --exec \"npm run lint && npm test && npm run coverage\""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rleenders/cassandra-migrate.git"
+    "url": "git+https://github.com/UUX-Brasil/cassandra-migrate"
+  },
+  "bugs": {
+    "url": "https://github.com/UUX-Brasil/cassandra-migrate/issues"
   },
   "keywords": [
     "cassandra",
@@ -17,25 +27,24 @@
     "migration",
     "node"
   ],
-  "author": "Robin Leenders <leendersr@gmail.com>",
-  "license": "MIT",
-  "contributors": [
-    {
-      "name": "Karan Keswani",
-      "email": "keswanikaran@gmail.com"
-    }
-  ],
-  "bugs": {
-    "url": "https://github.com/rleenders/cassandra-migrate/issues"
-  },
-  "homepage": "https://github.com/rleenders/cassandra-migrate#readme",
   "dependencies": {
     "async": "^0.9.0",
     "cassandra-driver": "^3.0.0",
-    "commander": "^2.8.1"
+    "commander": "^2.8.1",
+    "itaas-nodejs-tools": "git+https://github.com/UUX-Brasil/itaas-nodejs-tools.git#master",
+    "mkdirp": "^0.5.1",
+    "uuid": "^2.0.3"
   },
   "devDependencies": {
+    "eslint": "2.13.0",
+    "istanbul": "^0.4.4",
+    "mocha": "2.3.4",
+    "nodemon": "^1.9.2",
+    "rimraf": "^2.5.4",
+    "should": "8.2.2",
+    "supertest": "1.2.0"
   },
-  "scripts": {
-  }
+  "author": "",
+  "license": "MIT",
+  "homepage": "https://github.com/UUX-Brasil/cassandra-migrate#readme"
 }
