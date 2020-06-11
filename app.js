@@ -6,6 +6,7 @@ var program = require('commander');
 var Common = require('./util/common');
 var fs = require('fs');
 var DB = require('./util/database');
+const Helpers = require ('./util/helpers');
 
 /**
  * Usage information.
@@ -66,13 +67,14 @@ program
   .action((options) => {
     let db = new DB(program);
     let common = new Common(fs, db);
+    const dir = Helpers.getDir(options);
     common.createMigrationTable()
-      .then(common.getMigrationFiles(process.cwd()))
+      .then(common.getMigrationFiles(dir))
       .then(() => common.getMigrations())
       .then(() => common.getMigrationSet('up', options.num))
       .then((migrationLists) => {
         let Up = require('./commands/up');
-        let up = new Up(db, migrationLists);
+        let up = new Up(db, migrationLists, dir);
         if (!options.skip) {
           console.log('processing migration lists');
           console.log(migrationLists);
@@ -101,8 +103,9 @@ program
   .action((options) => {
     let db = new DB(program);
     let common = new Common(fs, db);
+    const dir = getDir(program);
     common.createMigrationTable()
-      .then(common.getMigrationFiles(process.cwd()))
+      .then(common.getMigrationFiles(dir))
       .then(() => common.getMigrations())
       .then(() => common.getMigrationSet('down', options.num))
       .then((migrationLists) => {
@@ -127,6 +130,8 @@ program
         process.exit(1);
       });
   });
+
+  
 /*
  //@TODO: add this functionality  so that a cql client isn't directly required
  program

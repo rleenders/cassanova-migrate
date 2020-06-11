@@ -9,8 +9,9 @@
 
 class Create {
 
-  constructor(fs, templateFile) {
+  constructor(fs, templateFile, dir) {
     this.fs = fs;
+    this.dir = dir;
     this.dateString = Math.floor(Date.now() / 1000) + '';
 
     var template = `
@@ -54,7 +55,7 @@ module.exports = migration${this.dateString};`;
     }
 
     var fileName = `${this.dateString}_${title}.js`;
-    this.fs.writeFileSync(`${process.cwd()}/${fileName}`, this.template);
+    this.fs.writeFileSync(`${this.dir}/${fileName}`, this.template);
     console.log(`Created a new migration file with name ${fileName}`);
   }
 }
