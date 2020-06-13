@@ -54,7 +54,7 @@ program
   .option('-t, --template "<template>"', "sets the template for create")
   .action((title, options) => {
     let Create = require('./commands/create');
-    let create = new Create(fs, options.template);
+    let create = new Create(fs, options.template, Helpers.getDir(options));
     create.newMigration(title);
     process.exit(0);
   });
