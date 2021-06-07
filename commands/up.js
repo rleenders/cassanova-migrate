@@ -4,8 +4,9 @@ var migration_settings = require('../scripts/migrationSettings.json');
 var path = require('path');
 
 class Up {
-  constructor(db, pendingMigrations) {
+  constructor(db, pendingMigrations, dir) {
     this.db = db;
+    this.dir = dir;
     this.pending = pendingMigrations;
     this.keyList = Object.keys(pendingMigrations).sort(function (a, b) {
       return a - b;
@@ -22,7 +23,7 @@ class Up {
           'file_name': fileName,
           'migration_number': attributes[ 0 ],
           'title': fileName.replace(".js", ""),
-          'run': require(path.resolve(process.cwd() + "/" + fileName))
+          'run': require(path.resolve(this.dir + "/" + fileName))
         };
         if (skip) {
           if (query.migration_number == skip) {
